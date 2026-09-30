@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>賽斯風格生活心態測驗</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Google Fonts (Inter & Noto Sans TC for Chinese) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Smooth fade and slide up animation for screens */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Option button hover effects */
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .option-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Hide elements utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-4 antialiased">
+
+    <!-- Main App Container -->
+    <div id="app-container" class="w-full max-w-2xl bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden relative">
+        
+        <!-- Background decorative elements -->
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 opacity-50 blur-2xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-40 h-40 rounded-full bg-gradient-to-tr from-teal-100 to-blue-100 opacity-50 blur-2xl"></div>
+
+        <!-- Content Area -->
+        <div class="relative z-10 p-6 sm:p-10 min-h-[400px] flex flex-col justify-center">
+
+            <!-- 1. Welcome Screen -->
+            <div id="screen-welcome" class="text-center fade-in-up">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-100 text-indigo-500 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4 tracking-tight">賽斯風格<br/>生活心態測驗</h1>
+                <p class="text-gray-600 mb-8 leading-relaxed max-w-md mx-auto">
+                    這是一趟自我覺察的旅程。共有4個主題、40個日常情境，幫助你檢視自己是否已將賽斯心法（安全、無辜、選擇、自發、廣闊現在）落實於生活中。
+                </p>
+                <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    開始測驗
+                </button>
+            </div>
+
+            <!-- 2. Quiz Screen -->
+            <div id="screen-quiz" class="hidden fade-in-up w-full">
+                <!-- Theme Header & Progress -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-end mb-2">
+                        <h2 id="theme-title" class="text-lg sm:text-xl font-bold text-indigo-700">主題 1/4</h2>
+                        <span id="question-progress" class="text-sm font-medium text-gray-500">1/10</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <!-- Question -->
+                <div class="bg-indigo-50/50 rounded-2xl p-6 mb-8 border border-indigo-100">
+                    <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-3">情境</span>
+                    <h3 id="question-text" class="text-xl sm:text-2xl font-medium text-gray-800 leading-snug">
+                        <!-- Question text goes here -->
+                    </h3>
+                </div>
+
+                <!-- Options -->
+                <div class="space-y-4" id="options-container">
+                    <!-- Options injected by JS -->
+                </div>
+            </div>
+
+            <!-- 3. Theme Result Screen -->
+            <div id="screen-theme-result" class="hidden text-center fade-in-up">
+                <h2 id="result-theme-title" class="text-2xl font-bold text-gray-800 mb-2">主題完成</h2>
+                <div class="my-8">
+                    <div class="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-purple-100 bg-purple-50 relative">
+                        <span id="theme-score" class="text-4xl font-extrabold text-purple-600">8</span>
+                        <span class="text-lg text-purple-400 absolute bottom-4 translate-y-full mt-2 font-medium">/ 10 分</span>
+                    </div>
+                </div>
+                <div class="bg-purple-50 rounded-2xl p-6 mb-8 mt-12">
+                    <p id="theme-interpretation" class="text-gray-700 leading-relaxed text-left">
+                        <!-- Interpretation goes here -->
+                    </p>
+                </div>
+                <button id="next-theme-btn" onclick="nextTheme()" class="w-full py-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-2xl transition duration-300">
+                    進入下一個主題
+                </button>
+            </div>
+
+            <!-- 4. Final Total Result Screen -->
+            <div id="screen-final-result" class="hidden text-center fade-in-up">
+                <div class="inline-block p-4 rounded-full bg-green-100 text-green-500 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">測驗完成！</h2>
+                <p class="text-gray-500 mb-6">你已走完這趟覺察之旅</p>
+                
+                <div class="flex justify-center items-center gap-4 mb-8">
+                    <div class="text-center">
+                        <span class="block text-sm text-gray-500 font-medium mb-1">總得分</span>
+                        <span id="final-score" class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">35</span>
+                        <span class="text-xl text-gray-400 font-medium">/ 40</span>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-indigo-50 to-teal-50 rounded-2xl p-6 mb-8 text-left border border-indigo-100">
+                    <h3 class="font-bold text-indigo-800 mb-2">總結解讀：</h3>
+                    <p id="final-interpretation" class="text-gray-700 leading-relaxed text-sm sm:text-base">
+                        <!-- Final interpretation here -->
+                    </p>
+                </div>
+
+                <button onclick="resetQuiz()" class="w-full sm:w-auto px-8 py-4 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-semibold rounded-2xl transition duration-300">
+                    重新測驗
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* Quiz Data Structured by Themes */
+        const quizData = [
+            {
+                title: "主題1：日常生活心態",
+                questions: [
+                    { scenario: "被主管當眾指出一個疏失。", options: [{ text: "我又做錯了。", score: 0 }, { text: "認出錯誤只是訊息，我是安全的。", score: 1 }] },
+                    { scenario: "拖著疲憊身軀面對一堆家事。", options: [{ text: "我應該把這些都做完。", score: 0 }, { text: "我選擇做這個。", score: 1 }] },
+                    { scenario: "虛度了一個週末。", options: [{ text: "我浪費了兩天。", score: 0 }, { text: "自發自我是療癒者。", score: 1 }] },
+                    { scenario: "同事升遷覺得自己落後。", options: [{ text: "我應該也要達到。", score: 0 }, { text: "在自己宇宙中孤獨者，不必比較。", score: 1 }] },
+                    { scenario: "為明天報告輾轉難眠。", options: [{ text: "萬一失敗怎麼辦。", score: 0 }, { text: "當下是威力之點。", score: 1 }] },
+                    { scenario: "想辭職追夢家人反對。", options: [{ text: "我不應該衝動。", score: 0 }, { text: "衝動是心靈的語言。", score: 1 }] },
+                    { scenario: "遭逢意外覺得倒霉。", options: [{ text: "命運對我不公。", score: 0 }, { text: "我是事件的源頭。", score: 1 }] },
+                    { scenario: "照鏡子挑剔自己。", options: [{ text: "我應該更好。", score: 0 }, { text: "我同意我自己。", score: 1 }] },
+                    { scenario: "同事做事不周。", options: [{ text: "他應該更專業。", score: 0 }, { text: "看人的基本善良意圖。", score: 1 }] },
+                    { scenario: "創作時滿腦子別人評價。", options: [{ text: "必須表現好。", score: 0 }, { text: "行動本身就是目的。", score: 1 }] }
+                ]
+            },
+            {
+                title: "主題2：巧合、共時性與時間空間",
+                questions: [
+                    { scenario: "反覆遇到同數字。", options: [{ text: "隨機巧合。", score: 0 }, { text: "實相無意外。", score: 1 }] },
+                    { scenario: "正要聯絡對方剛好打來。", options: [{ text: "純屬運氣。", score: 0 }, { text: "外在事件是內在事件。", score: 1 }] },
+                    { scenario: "想起一首歌店裡正在播。", options: [{ text: "太碰巧了。", score: 0 }, { text: "宇宙對內在感官是透明的。", score: 1 }] },
+                    { scenario: "覺得壞事要發生結果真發生。", options: [{ text: "我是烏鴉嘴。", score: 0 }, { text: "預期創造實相。", score: 1 }] },
+                    { scenario: "錯過班車懊悔。", options: [{ text: "錯過了真是損失。", score: 0 }, { text: "沒有錯過只有不同可能實相。", score: 1 }] },
+                    { scenario: "陌生城市覺得來過。", options: [{ text: "想太多。", score: 0 }, { text: "時間同時存在。", score: 1 }] },
+                    { scenario: "身處困境覺得被困。", options: [{ text: "走不出去。", score: 0 }, { text: "空間不是牢籠。", score: 1 }] },
+                    { scenario: "為過去未來焦慮。", options: [{ text: "改變不了。", score: 0 }, { text: "過去未來同時存在廣闊現在。", score: 1 }] },
+                    { scenario: "糾結先有因還先有果。", options: [{ text: "凡事有因果。", score: 0 }, { text: "廣闊現在無因果。", score: 1 }] },
+                    { scenario: "覺得自己是時間長河一粒沙。", options: [{ text: "我算什麼。", score: 0 }, { text: "你是主要行動事件。", score: 1 }] }
+                ]
+            },
+            {
+                title: "主題3：夢境、清醒夢與出體投射",
+                questions: [
+                    { scenario: "亂糟糟的夢覺得浪費時間。", options: [{ text: "大腦整理資訊。", score: 0 }, { text: "夢宇宙同等真實。", score: 1 }] },
+                    { scenario: "夢裡怕醒不來。", options: [{ text: "卡在夢裡。", score: 0 }, { text: "夢中和現在一樣清醒。", score: 1 }] },
+                    { scenario: "夢見飛翔覺得是想像。", options: [{ text: "根本不存在。", score: 0 }, { text: "以內在感官感知非偽裝實相。", score: 1 }] },
+                    { scenario: "夢成真覺得毛骨悚然。", options: [{ text: "預言未來好可怕。", score: 0 }, { text: "內在自我不受阻礙。", score: 1 }] },
+                    { scenario: "出體只用肉眼視角。", options: [{ text: "用平常視角看。", score: 0 }, { text: "允許無須肉身視角感知。", score: 1 }] },
+                    { scenario: "嘗試出體覺得出不來。", options: [{ text: "我不夠厲害。", score: 0 }, { text: "放鬆輕輕搖晃。", score: 1 }] },
+                    { scenario: "夢中遇智慧人物覺得是幻覺。", options: [{ text: "潛意識編故事。", score: 0 }, { text: "夢中人格有自己意識。", score: 1 }] },
+                    { scenario: "半夢半醒卡在中間。", options: [{ text: "該快點睡。", score: 0 }, { text: "意識擴展極佳狀態。", score: 1 }] },
+                    { scenario: "被可怕夢境影響心情。", options: [{ text: "壞預兆。", score: 0 }, { text: "內在自我在處理意義。", score: 1 }] },
+                    { scenario: "覺得清醒才真實。", options: [{ text: "夢是附加品。", score: 0 }, { text: "夢中人格一樣警覺。", score: 1 }] }
+                ]
+            },
+            {
+                title: "主題4：我是誰？我是什麼？",
+                questions: [
+                    { scenario: "指著身體說是自己。", options: [{ text: "我就是身體。", score: 0 }, { text: "本體遠大於人格。", score: 1 }] },
+                    { scenario: "覺得沒有記憶就不是我。", options: [{ text: "完全消失。", score: 0 }, { text: "本體知道它自己知道。", score: 1 }] },
+                    { scenario: "只認同醒著的自己。", options: [{ text: "做夢的我不是我。", score: 0 }, { text: "做夢的我更接近本體。", score: 1 }] },
+                    { scenario: "覺得我是出生才開始。", options: [{ text: "前世與我無關。", score: 0 }, { text: "本體早有起源。", score: 1 }] },
+                    { scenario: "認為我是固定實體。", options: [{ text: "性格不會變。", score: 0 }, { text: "自我連續行動改變中。", score: 1 }] },
+                    { scenario: "把自看作孤立的人。", options: [{ text: "與他人分開。", score: 0 }, { text: "存在另一個之內。", score: 1 }] },
+                    { scenario: "以外在角色找答案。", options: [{ text: "身分由角色決定。", score: 0 }, { text: "穿過所有牆的藍圖。", score: 1 }] },
+                    { scenario: "覺得會計畫的意識才是真我。", options: [{ text: "計畫部分才是。", score: 0 }, { text: "意識心只是更大意識輝光。", score: 1 }] },
+                    { scenario: "怕死後我消失。", options: [{ text: "死了就沒了。", score: 0 }, { text: "物質存在後存活的是內在自我。", score: 1 }] },
+                    { scenario: "覺得自己是存有碎片。", options: [{ text: "微不足道。", score: 0 }, { text: "本體獨立完整。", score: 1 }] }
+                ]
+            }
+        ];
+
+        let currentThemeIndex = 0;
+        let currentQuestionIndex = 0;
+        let themeScores = [0, 0, 0, 0];
+        
+        // DOM Elements mapping
+        const screens = {
+            welcome: document.getElementById('screen-welcome'),
+            quiz: document.getElementById('screen-quiz'),
+            themeResult: document.getElementById('screen-theme-result'),
+            finalResult: document.getElementById('screen-final-result')
+        };
+
+        // Utility to switch screens
+        function showScreen(screenName) {
+            Object.values(screens).forEach(s => {
+                s.classList.add('hidden');
+                s.classList.remove('fade-in-up');
+            });
+            screens[screenName].classList.remove('hidden');
+            // Trigger reflow to restart animation
+            void screens[screenName].offsetWidth;
+            screens[screenName].classList.add('fade-in-up');
+        }
+
+        // Shuffle options so correct answer isn't always B (optional, but good for UI)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            currentThemeIndex = 0;
+            currentQuestionIndex = 0;
+            themeScores = [0, 0, 0, 0];
+            loadQuestion();
+            showScreen('quiz');
+        }
+
+        function loadQuestion() {
+            const theme = quizData[currentThemeIndex];
+            const question = theme.questions[currentQuestionIndex];
+            
+            // Update Headers & Progress
+            document.getElementById('theme-title').innerText = theme.title;
+            document.getElementById('question-progress').innerText = `${currentQuestionIndex + 1} / ${theme.questions.length}`;
+            
+            const progressPercent = ((currentQuestionIndex) / theme.questions.length) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+
+            // Setup Question Text
+            document.getElementById('question-text').innerText = question.scenario;
+
+            // Setup Options (shuffle to randomize A/B layout)
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            // Clone options array to avoid mutating original
+            let displayOptions = [...question.options];
+            shuffleArray(displayOptions);
+
+            displayOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 sm:p-5 bg-white border-2 border-indigo-50 rounded-2xl shadow-sm text-gray-700 font-medium hover:border-indigo-300 focus:outline-none focus:ring-4 focus:ring-indigo-100 flex items-center";
+                
+                // Content
+                btn.innerHTML = `
+                    <div class="w-6 h-6 mr-4 rounded-full border-2 border-indigo-200 flex-shrink-0 flex items-center justify-center pointer-events-none group-hover:border-indigo-400 transition-colors">
+                       <div class="w-3 h-3 rounded-full bg-indigo-500 opacity-0 transition-opacity"></div>
+                    </div>
+                    <span class="flex-grow">${opt.text}</span>
+                `;
+                
+                btn.onclick = () => handleAnswer(opt.score, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(score, buttonEl) {
+            // Visual feedback on click
+            const dot = buttonEl.querySelector('div > div');
+            if(dot) dot.classList.remove('opacity-0');
+            buttonEl.classList.add('border-indigo-400', 'bg-indigo-50');
+
+            // Disable all buttons immediately
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            // Record score
+            themeScores[currentThemeIndex] += score;
+
+            // Small delay for UX, then move forward
+            setTimeout(() => {
+                currentQuestionIndex++;
+                const theme = quizData[currentThemeIndex];
+
+                if (currentQuestionIndex < theme.questions.length) {
+                    // Next Question
+                    loadQuestion();
+                } else {
+                    // Theme Finished
+                    showThemeResult();
+                }
+            }, 400);
+        }
+
+        function showThemeResult() {
+            const theme = quizData[currentThemeIndex];
+            const score = themeScores[currentThemeIndex];
+            
+            document.getElementById('result-theme-title').innerText = `${theme.title} 完成`;
+            document.getElementById('theme-score').innerText = score;
+
+            // Generate interpretation based on score
+            let interpretation = "";
+            if (score <= 4) {
+                interpretation = "你目前仍較習慣停留在「應該/我有罪/受害者」等舊有的信念慣性中。不必自責，賽斯心法告訴我們，這正是覺察的絕佳起點！溫柔對待自己，試著從「我是無辜的、我選擇」開始做起。";
+            } else if (score <= 7) {
+                interpretation = "很棒！你已經掌握了賽斯心法的部分核心，但在某些特定情境（如面對壓力或自我評價時）仍會不小心滑回慣性。繼續保持覺知，一次次將力量收回當下。";
+            } else {
+                interpretation = "太精彩了！你已能穩定捕捉賽斯核心精神（安全、無辜、選擇、自發、價值完成、廣闊現在）。你能熟練地看穿幻象，並將精神落實在生活瑣事與深刻體驗中，請繼續保持這份恩寵狀態。";
+            }
+            
+            document.getElementById('theme-interpretation').innerText = interpretation;
+
+            // Update button text if it's the last theme
+            const nextBtn = document.getElementById('next-theme-btn');
+            if (currentThemeIndex === quizData.length - 1) {
+                nextBtn.innerText = "查看最終總結";
+            } else {
+                nextBtn.innerText = "進入下一個主題";
+            }
+
+            showScreen('themeResult');
+        }
+
+        function nextTheme() {
+            currentThemeIndex++;
+            if (currentThemeIndex < quizData.length) {
+                currentQuestionIndex = 0;
+                loadQuestion();
+                showScreen('quiz');
+            } else {
+                showFinalResult();
+            }
+        }
+
+        function showFinalResult() {
+            const totalScore = themeScores.reduce((a, b) => a + b, 0);
+            document.getElementById('final-score').innerText = totalScore;
+
+            let finalInterp = "";
+            if(totalScore >= 32) {
+                finalInterp = "你是一位真正的「腳踏實地的理想主義者」。從日常生活瑣事到對時間、空間、夢境、甚至本體靈魂的認知，你都能以賽斯的高度來生活。你清楚知道自己遠大於這個肉身人格，並在廣闊的現在中享受你的創造！";
+            } else if (totalScore >= 20) {
+                finalInterp = "你正走在穩健的實修道路上。你已經能將賽斯觀念應用在生活中，偶爾被舊有的線性時間或自我侷限困住時，也能很快察覺。記住，你的內在自我永遠在支持著你，當下即是威力之點。";
+            } else {
+                finalInterp = "這是一趟美好的開端。你正在解構過往社會與自我強加的各種限制。不要著急，成長不是競爭而是價值完成。請記得賽斯說的：「你住在一個安全的宇宙裡，你是無辜的。」慢慢享受這趟找回自己力量的旅程。";
+            }
+            document.getElementById('final-interpretation').innerText = finalInterp;
+
+            showScreen('finalResult');
+        }
+
+        function resetQuiz() {
+            startQuiz();
+            showScreen('welcome');
+        }
+    </script>
+</body>
+</html>
